@@ -127,11 +127,18 @@ final class FetchMessageInfoHandler: BaseIMAPCommandHandler<[MessageInfo]>, IMAP
             // Handle to addresses - capture all recipients
             header.to = envelope.to.map { formatAddress($0) }
 
+            // Handle replyTo addresses - capture all reply to recipients
+            header.replyTo = envelope.reply.map { formatAddress($0) }
+            
             // Handle cc addresses - capture all recipients
             header.cc = envelope.cc.map { formatAddress($0) }
 
             // Handle bcc addresses - capture all recipients
             header.bcc = envelope.bcc.map { formatAddress($0) }
+            
+            if let inReplyTo = envelope.inReplyTo {
+                header.inReplyTo = String(inReplyTo)
+            }
             
             if let date = envelope.date {
                 let dateString = String(date)

@@ -19,6 +19,9 @@ public struct MessageInfo: Codable, Sendable {
     
     /// The recipients of the message
     public var to: [String] = []
+    
+    /// The recipients to include in the response to the message
+    public var replyTo: [String] = []
 
     /// The CC recipients of the message
     public var cc: [String] = []
@@ -31,6 +34,9 @@ public struct MessageInfo: Codable, Sendable {
     
     /// The message ID
     public var messageId: String?
+    
+    /// The message ID this message replies to
+    public var inReplyTo:String?
     
     /// The flags of the message
     public var flags: [Flag]
@@ -47,10 +53,12 @@ public struct MessageInfo: Codable, Sendable {
         case subject
         case from
         case to
+        case replyTo
         case cc
         case bcc
         case date
         case messageId
+        case inReplyTo
         case flags
         case parts
         case additionalFields
@@ -63,9 +71,11 @@ public struct MessageInfo: Codable, Sendable {
     ///   - subject: The subject of the message
     ///   - from: The sender of the message
     ///   - to: The recipients of the message
+    ///   - replyTo: The recipients to include in the response to the message
     ///   - cc: The CC recipients of the message
     ///   - date: The date of the message
     ///   - messageId: The message ID
+    ///   - inReplyTo: The message ID this message replies to
     ///   - flags: The flags of the message
     ///   - parts: The message parts
     ///   - additionalFields: Additional header fields
@@ -75,10 +85,12 @@ public struct MessageInfo: Codable, Sendable {
         subject: String? = nil,
         from: String? = nil,
         to: [String] = [],
+        replyTo: [String] = [],
         cc: [String] = [],
         bcc: [String] = [],
         date: Date? = nil,
         messageId: String? = nil,
+        inReplyTo: String? = nil,
         flags: [Flag] = [],
         parts: [MessagePart] = [],
         additionalFields: [String: String]? = nil
@@ -88,10 +100,12 @@ public struct MessageInfo: Codable, Sendable {
         self.subject = subject
         self.from = from
         self.to = to
+        self.replyTo = replyTo
         self.cc = cc
         self.bcc = bcc
         self.date = date
         self.messageId = messageId
+        self.inReplyTo = inReplyTo
         self.flags = flags
         self.parts = parts
         self.additionalFields = additionalFields
@@ -107,10 +121,12 @@ public extension MessageInfo {
         let subject = try container.decodeIfPresent(String.self, forKey: .subject)
         let from = try container.decodeIfPresent(String.self, forKey: .from)
         let to = try container.decodeIfPresent([String].self, forKey: .to) ?? []
+        let replyTo = try container.decodeIfPresent([String].self, forKey: .replyTo) ?? []
         let cc = try container.decodeIfPresent([String].self, forKey: .cc) ?? []
         let bcc = try container.decodeIfPresent([String].self, forKey: .bcc) ?? []
         let date = try container.decodeIfPresent(Date.self, forKey: .date)
         let messageId = try container.decodeIfPresent(String.self, forKey: .messageId)
+        let inReplyTo = try container.decodeIfPresent(String.self, forKey: .inReplyTo)
         let flags = try container.decodeIfPresent([Flag].self, forKey: .flags) ?? []
         let parts = try container.decodeIfPresent([MessagePart].self, forKey: .parts) ?? []
         let additionalFields = try container.decodeIfPresent([String: String].self, forKey: .additionalFields)
@@ -121,10 +137,12 @@ public extension MessageInfo {
             subject: subject,
             from: from,
             to: to,
+            replyTo: replyTo,
             cc: cc,
             bcc: bcc,
             date: date,
             messageId: messageId,
+            inReplyTo: inReplyTo,
             flags: flags,
             parts: parts,
             additionalFields: additionalFields
