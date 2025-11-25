@@ -51,6 +51,12 @@ public enum Mailbox {
             /// The mailbox is the primary inbox
             public static let inbox = Attributes(rawValue: 1 << 11)
             
+            /// The mailbox containing all messages except trash and junk
+            public static let all = Attributes(rawValue: 1 << 12)
+            
+            /// The mailbox containing all messages except trash and junk
+            public static let important = Attributes(rawValue: 1 << 13)
+            
             /// Initialize from NIOIMAPCore.MailboxInfo.Attribute array
             init(from attributes: [NIOIMAPCore.MailboxInfo.Attribute]) {
                 var result: Attributes = []
@@ -84,6 +90,10 @@ public enum Mailbox {
                             result.insert(.trash)
                         } else if rawString.contains("\\Inbox") {
                             result.insert(.inbox)
+                        } else if rawString.contains("\\All") {
+                            result.insert(.all)
+                        } else if rawString.contains("\\Important") {
+                            result.insert(.important)
                         }
                         // Ignore any other attributes for now
                     }
