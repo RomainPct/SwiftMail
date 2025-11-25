@@ -102,6 +102,12 @@ public indirect enum SearchCriteria: Sendable {
     /** Matches messages with the specified UID. */
     case uid(Int)
     
+    /** Matches messages after the specified UID. */
+    case uidAfter(UID)
+    
+    /** Matches messages before the specified UID. */
+    case uidBefore(UID)
+    
     /** Matches messages that do not have the `\Answered` flag set. */
     case unanswered
     
@@ -223,6 +229,14 @@ public indirect enum SearchCriteria: Sendable {
             let uid = NIOIMAPCore.UID(rawValue: UInt32(value))
             let range = NIOIMAPCore.MessageIdentifierRange<NIOIMAPCore.UID>(uid)
             let set = NIOIMAPCore.MessageIdentifierSetNonEmpty<NIOIMAPCore.UID>(range: range)
+            return .uid(.set(set))
+        case .uidAfter(let value):
+            let uid = NIOIMAPCore.UID(rawValue: value.value)
+            let set = NIOIMAPCore.MessageIdentifierSetNonEmpty(range: uid...)
+            return .uid(.set(set))
+        case .uidBefore(let value):
+            let uid = NIOIMAPCore.UID(rawValue: value.value)
+            let set = NIOIMAPCore.MessageIdentifierSetNonEmpty(range: ...uid)
             return .uid(.set(set))
         case .unanswered:
             return .unanswered
