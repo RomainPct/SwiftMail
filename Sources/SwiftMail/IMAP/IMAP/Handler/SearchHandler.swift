@@ -40,19 +40,24 @@ final class SearchHandler<T: MessageIdentifier>: BaseIMAPCommandHandler<MessageI
         }
         
 		// Check for search response data using proper pattern matching
-		if case let .untagged(untagged) = response,
-		   case let .mailboxData(mailboxData) = untagged,
-		   case let .search(ids, _) = mailboxData {
-			// Convert the IDs to the appropriate MessageIdentifier type
-			let results = ids.map { T.init(UInt32($0)) }
-			searchResults.append(contentsOf: results)
-			print("Extracted \(results.count) message identifiers from search response")
-		}
+        if case let .untagged(untagged) = response, case let .mailboxData(mailboxData) = untagged {
+            switch mailboxData {
+            case .search(let ids, let modificationSequenceValue):
+                let results = ids.map { T.init(UInt32($0)) }
+                searchResults.append(contentsOf: results)
+                print("Extracted \(results.count) message identifiers from search response")
+            case .searchSort(let searchSort):
+                let results = searchSort.identifiers.map { T.init(UInt32($0)) }
+                searchResults.append(contentsOf: results)
+                print("Extracted \(results.count) message identifiers from search sort response")
+            default: break
+            }
+        }
         
         return handled
     }
     
-    	override func handleTaggedOKResponse(_ response: TaggedResponse) {
+    override func handleTaggedOKResponse(_ response: TaggedResponse) {
 		// Call super to handle CLIENTBUG warnings
 		super.handleTaggedOKResponse(response)
 		
