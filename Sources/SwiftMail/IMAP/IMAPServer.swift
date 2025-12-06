@@ -701,14 +701,27 @@ public actor IMAPServer {
     /// - Parameter identifierSet: The set of message identifiers to fetch
     /// - Returns: An `AsyncThrowingStream` yielding `Message` instances with all parts
     public nonisolated func fetchMessages<T: MessageIdentifier>(using identifierSet: MessageIdentifierSet<T>) -> AsyncThrowingStream<Message, Error> {
+        fetchMessages(using: identifierSet.toArray())
+    }
+    
+    /// Fetch complete messages with all parts using a message identifier array as a stream
+    ///
+    /// This method returns an `AsyncThrowingStream` that yields complete `Message` objects one at a time.
+    /// It retrieves each message's headers and body sequentially, ensuring IMAP commands
+    /// are executed in strict order. The sequence supports cancellation, allowing the
+    /// caller to stop fetching early without waiting for all messages to be downloaded.
+    ///
+    /// - Parameter identifierArray: The set of message identifiers to fetch
+    /// - Returns: An `AsyncThrowingStream` yielding `Message` instances with all parts
+    public nonisolated func fetchMessages<T: MessageIdentifier>(using identifierArray: [T]) -> AsyncThrowingStream<Message, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
                 do {
-                    guard !identifierSet.isEmpty else {
+                    guard !identifierArray.isEmpty else {
                         throw IMAPError.emptyIdentifierSet
                     }
 
-                    for identifier in identifierSet.toArray() {
+                    for identifier in identifierArray {
                         try Task.checkCancellation()
                         if let header = try await fetchMessageInfo(for: identifier) {
                             let email = try await fetchMessage(from: header)
