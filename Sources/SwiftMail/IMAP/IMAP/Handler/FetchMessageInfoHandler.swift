@@ -178,7 +178,7 @@ final class FetchMessageInfoHandler: BaseIMAPCommandHandler<[MessageInfo]>, IMAP
             }
             
         case .uid(let uid):
-				header.uid = UID(nio: uid)
+            header.uid = UID(nio: uid)
             
         case .flags(let flags):
             header.flags = flags.map(self.convertFlag)
@@ -187,6 +187,9 @@ final class FetchMessageInfoHandler: BaseIMAPCommandHandler<[MessageInfo]>, IMAP
             if case .valid(let structure) = bodyStructure {
                 header.parts = Array<MessagePart>(structure)
             }
+            
+        case .fetchModificationResponse(let fetchModificationResponse):
+            header.modSeq = UInt64(fetchModificationResponse.modificationSequenceValue)
             
         default:
             break

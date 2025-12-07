@@ -41,6 +41,9 @@ public struct MessageInfo: Codable, Sendable {
     /// The flags of the message
     public var flags: [Flag]
     
+    /// The last modification sequence of the message
+    public var modSeq: UInt64?
+    
     /// The message parts
     public var parts: [MessagePart]
     
