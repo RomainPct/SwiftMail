@@ -375,8 +375,8 @@ public actor IMAPServer {
      - Important: The returned status does not include an unseen count, as this is not provided by the IMAP SELECT command.
      To get the count of unseen messages, use `mailboxStatus("INBOX").unseenCount` instead.
      */
-    @discardableResult public func selectMailbox(_ mailboxName: String) async throws -> Mailbox.Status {
-        let command = SelectMailboxCommand(mailboxName: mailboxName)
+    @discardableResult public func selectMailbox(_ mailboxName: String, parameters: [SelectParameter] = []) async throws -> Mailbox.Status {
+        let command = SelectMailboxCommand(mailboxName: mailboxName, parameters: parameters)
         return try await executeCommand(command)
     }
     

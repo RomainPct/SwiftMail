@@ -8,10 +8,12 @@ struct SelectMailboxCommand: IMAPCommand {
     typealias HandlerType = SelectHandler
     
     let mailboxName: String
+    let selectParameters:[SelectParameter]
     let timeoutSeconds: Int = 30
     
-    init(mailboxName: String) {
+    init(mailboxName: String, parameters:[SelectParameter]) {
         self.mailboxName = mailboxName
+        self.selectParameters = parameters
     }
     
     func validate() throws {
@@ -21,6 +23,9 @@ struct SelectMailboxCommand: IMAPCommand {
     }
     
     func toTaggedCommand(tag: String) -> TaggedCommand {
-        return TaggedCommand(tag: tag, command: .select(MailboxName(ByteBuffer(string: mailboxName))))
+        return TaggedCommand(tag: tag, command: .select(
+            MailboxName(ByteBuffer(string: mailboxName)),
+            selectParameters
+        ))
     }
 }
