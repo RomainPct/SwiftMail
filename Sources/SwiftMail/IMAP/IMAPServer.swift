@@ -662,14 +662,21 @@ public actor IMAPServer {
     /// - Parameter identifierSet: The set of message identifiers to fetch
     /// - Returns: An AsyncThrowingStream yielding MessageInfo one at a time
     public nonisolated func fetchMessageInfos<T: MessageIdentifier>(using identifierSet: MessageIdentifierSet<T>) -> AsyncThrowingStream<MessageInfo, Error> {
+        fetchMessageInfos(using: identifierSet.toArray())
+    }
+    
+    /// Stream message headers for an array of identifiers
+    /// - Parameter identifierArray: The array of message identifiers to fetch
+    /// - Returns: An AsyncThrowingStream yielding MessageInfo one at a time
+    public nonisolated func fetchMessageInfos<T: MessageIdentifier>(using identifierArray: [T]) -> AsyncThrowingStream<MessageInfo, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
                 do {
-                    guard !identifierSet.isEmpty else {
+                    guard !identifierArray.isEmpty else {
                         throw IMAPError.emptyIdentifierSet
                     }
                     
-                    for identifier in identifierSet.toArray() {
+                    for identifier in identifierArray {
                         try Task.checkCancellation()
                         let singleSet = MessageIdentifierSet<T>(identifier)
                         let command = FetchMessageInfoCommand(identifierSet: singleSet)
