@@ -8,9 +8,7 @@ extension String {
     /// - Returns: True if the string matches email format
     public func isValidEmail() -> Bool {
         let pattern = #"""
-        ^(?:[a-zA-Z0-9](?:[a-zA-Z0-9._%+-]{0,61}[a-zA-Z0-9])?@
-        [a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?
-        (?:\.[a-zA-Z]{2,})+)$
+        ^(?:[a-zA-Z0-9](?:[a-zA-Z0-9._%+-]{0,61}[a-zA-Z0-9])?@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,})+)$
         """#
         
         do {
