@@ -27,6 +27,11 @@ extension Email {
             content += "Cc: \(self.ccRecipients.map { $0.description }.joined(separator: ", "))\r\n"
         }
 
+        if let inReplyTo = inReplyTo {
+            content += "In-Reply-To: \(inReplyTo)\r\n"
+            content += "References: \(inReplyTo)\r\n"
+        }
+        
         content += "Subject: \(self.subject)\r\n"
         content += "MIME-Version: 1.0\r\n"
 

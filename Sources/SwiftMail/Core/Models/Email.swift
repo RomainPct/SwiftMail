@@ -22,6 +22,9 @@ public struct Email: Sendable {
     /** The subject of the email */
     public var subject: String
     
+    /** The message id to reply to */
+    public var inReplyTo: String?
+    
     /** The plain text body of the email */
     public var textBody: String
     
@@ -49,6 +52,7 @@ public struct Email: Sendable {
         ccRecipients: [EmailAddress] = [],
         bccRecipients: [EmailAddress] = [],
         subject: String,
+        inReplyTo: String? = nil,
         textBody: String,
         htmlBody: String? = nil,
         attachments: [Attachment]? = nil
@@ -58,6 +62,7 @@ public struct Email: Sendable {
         self.ccRecipients = ccRecipients
         self.bccRecipients = bccRecipients
         self.subject = subject
+        self.inReplyTo = inReplyTo
         self.textBody = textBody
         self.htmlBody = htmlBody
         self.attachments = attachments
