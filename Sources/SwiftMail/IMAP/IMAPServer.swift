@@ -933,6 +933,31 @@ public actor IMAPServer {
     }
     
     /**
+     Updates gmail labels on messages.
+     
+     This method can add, remove, or replace labels on messages.
+     
+     The generic type T determines the identifier type:
+     - Use `SequenceNumber` for temporary message numbers that may change
+     - Use `UID` for permanent message identifiers that remain stable
+     
+     - Parameters:
+     - labels: The labels to modify
+     - identifierSet: The set of messages to update
+     - operation: The type of update operation (add, remove, or set)
+     - Throws:
+     - `IMAPError.storeFailed` if the label update fails
+     - `IMAPError.emptyIdentifierSet` if the identifier set is empty
+     - Note: Logs labels updates at debug level with operation type and message count
+     */
+    public func gmailStore<T:MessageIdentifier>(labels:[String], on identifierSet: MessageIdentifierSet<T>, operation: StoreOperation) async throws {
+        let gmailLabels = labels.map { GmailLabel(useAttribute: UseAttribute.init($0)) }
+        let storeData = GmailStoreData.labels(gmailLabels, operation == .add ? .add : .remove)
+        let command = GmailStoreCommand(identifierSet: identifierSet, data: storeData)
+        try await executeCommand(command)
+    }
+    
+    /**
      Permanently removes messages marked for deletion.
      
      This method removes all messages with the \Deleted flag from the selected mailbox.

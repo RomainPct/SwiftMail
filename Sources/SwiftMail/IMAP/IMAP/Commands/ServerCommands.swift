@@ -98,6 +98,37 @@ struct StoreCommand<T: MessageIdentifier>: IMAPCommand {
     }
 }
 
+struct GmailStoreCommand<T: MessageIdentifier>: IMAPCommand {
+    
+    typealias ResultType = Void
+    typealias HandlerType = StoreHandler
+    
+    /// The message identifier to update
+    let identifierSet: MessageIdentifierSet<T>
+    
+    /// The data to store
+    let data: GmailStoreData
+    
+    /// Validate the command before execution
+    func validate() throws {
+        guard !identifierSet.isEmpty else {
+            throw IMAPError.emptyIdentifierSet
+        }
+    }
+    
+    /// Convert to an IMAP tagged command
+    /// - Parameter tag: The command tag
+    /// - Returns: A TaggedCommand ready to be sent to the server
+    func toTaggedCommand(tag: String) -> TaggedCommand {
+        if T.self == UID.self {
+            return TaggedCommand(tag: tag, command: .uidStore(.set(identifierSet.toNIOSet()), [], data.toNIO()))
+        } else {
+            return TaggedCommand(tag: tag, command: .store(.set(identifierSet.toNIOSet()), [], data.toNIO()))
+        }
+    }
+    
+}
+
 /// Command for expunging deleted messages
 struct ExpungeCommand: IMAPCommand {
     typealias ResultType = Void
