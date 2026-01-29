@@ -53,6 +53,8 @@ public actor IMAPServer {
     /** Special folders - mailboxes with SPECIAL-USE attributes */
     public private(set) var specialMailboxes: [Mailbox.Info] = []
     
+    public private(set) var currentMailbox: String? = nil
+    
     /// Namespaces discovered from the server
     public private(set) var namespaces: Namespace.Response?
     
@@ -377,7 +379,34 @@ public actor IMAPServer {
      */
     @discardableResult public func selectMailbox(_ mailboxName: String, parameters: [SelectParameter] = []) async throws -> Mailbox.Status {
         let command = SelectMailboxCommand(mailboxName: mailboxName, parameters: parameters)
-        return try await executeCommand(command)
+        let result = try await executeCommand(command)
+        currentMailbox = mailboxName
+        return result
+    }
+    
+    /**
+     Select a mailbox only if it's not already selected
+
+     This method selects a mailbox and makes it the current mailbox for subsequent
+     operations. Only one mailbox can be selected at a time.
+
+     - Parameter mailboxName: The name of the mailbox to select
+     - Returns: Status information about the selected mailbox or nil if mailbox was already selected
+     - Throws:
+     - `IMAPError.selectFailed` if the mailbox cannot be selected
+     - `IMAPError.connectionFailed` if not connected
+     - Note: Logs mailbox selection at debug level
+     - Important: The returned status does not include an unseen count, as this is not provided by the IMAP SELECT command.
+     To get the count of unseen messages, use `mailboxStatus("INBOX").unseenCount` instead.
+     */
+    @discardableResult public func selectMailboxIfNeeded(_ mailboxName: String, parameters: [SelectParameter] = []) async throws -> Mailbox.Status? {
+        guard mailboxName != currentMailbox else {
+            return nil
+        }
+        let command = SelectMailboxCommand(mailboxName: mailboxName, parameters: parameters)
+        let result = try await executeCommand(command)
+        currentMailbox = mailboxName
+        return result
     }
     
     /**
