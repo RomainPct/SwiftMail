@@ -86,6 +86,11 @@ final class SelectHandler: BaseIMAPCommandHandler<Mailbox.Status>, IMAPCommandHa
                                     lock.withLock {
                                         mailboxInfo.isReadOnly = false
                                     }
+                                
+                                case .highestModificationSequence(let modSeq):
+                                    lock.withLock {
+                                        mailboxInfo.modificationSequenceValue = modSeq
+                                    }
                                     
                                 default:
                                     break
