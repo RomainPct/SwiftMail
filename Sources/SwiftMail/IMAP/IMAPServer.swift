@@ -1483,7 +1483,6 @@ extension IMAPServer {
         let supportsSpecialUse = capabilities.contains(NIOIMAPCore.Capability("SPECIAL-USE"))
         
         // Get all mailboxes and store them
-        self.mailboxes = try await listMailboxes()
         var specialFolders: [Mailbox.Info] = []
         
         // Flag to track if we've found an explicit inbox
@@ -1493,6 +1492,7 @@ extension IMAPServer {
             // Create a ListCommand with SPECIAL-USE return option
             let command = ListCommand(returnOptions: [.specialUse])
             let mailboxesWithAttributes = try await executeCommand(command)
+            self.mailboxes = mailboxesWithAttributes
             
             // Keep only mailboxes with special-use attributes
             for mailbox in mailboxesWithAttributes {
@@ -1513,6 +1513,7 @@ extension IMAPServer {
             }
         } else {
             // Detect special folders by name when SPECIAL-USE is not supported
+            self.mailboxes = try await listMailboxes()
             for mailbox in mailboxes {
                 var attributes = mailbox.attributes
                 var hasSpecialUse = false
