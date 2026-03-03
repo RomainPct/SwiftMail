@@ -1194,6 +1194,9 @@ public actor IMAPServer {
             
             // Write the command to the channel wrapped as CommandStreamPart
             let taggedCommand = command.toTaggedCommand(tag: tag)
+            #if DEBUG
+            print(taggedCommand.debugDescription)
+            #endif
             let wrapped = IMAPClientHandler.OutboundIn.part(CommandStreamPart.tagged(taggedCommand))
             try await channel.writeAndFlush(wrapped).get()
             
